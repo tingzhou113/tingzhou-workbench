@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="汀洲工作台">
+<meta name="theme-color" content="#FF9EC4">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23FF9EC4'/><text x='50' y='68' font-size='50' text-anchor='middle'>🎀</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23FF9EC4'/><text x='50' y='68' font-size='50' text-anchor='middle'>🎀</text></svg>">
+<title>汀洲工作台</title>
+<style>
+:root{
+  --pink:#FF9EC4;--pink-light:#FFD6E5;--pink-dark:#E0789F;
+  --yellow:#FFE066;--orange:#FFB347;--green:#7FD8A0;--blue:#7EC8E3;
+  --bg:#FFF5F8;--card:#fff;--text:#4A3340;--text-light:#8a6a78;
+  --radius:18px;--shadow:0 4px 20px rgba(255,158,196,.15);
+  --shadow-hover:0 6px 28px rgba(255,158,196,.28);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.6;
+  min-height:100vh;padding-bottom:40px;
+  -webkit-font-smoothing:antialiased;
+}
+/* 顶部 */
+.header{
+  background:linear-gradient(135deg,var(--pink) 0%,var(--pink-dark) 100%);
+  padding:50px 20px 24px;color:#fff;text-align:center;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 16px rgba(224,120,159,.3);
+}
+.header-avatar{font-size:42px;margin-bottom:6px;animation:bounce 2s ease infinite;}
+.header h1{font-size:22px;font-weight:700;margin-bottom:4px;}
+.header p{font-size:13px;opacity:.9;}
+.header .date{font-size:12px;opacity:.8;margin-top:6px;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+
+/* 导航 */
+.nav{
+  display:flex;gap:10px;padding:16px 16px 8px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.nav::-webkit-scrollbar{display:none;}
+.nav-item{
+  flex-shrink:0;padding:10px 18px;border-radius:30px;
+  background:var(--card);color:var(--text-light);
+  font-size:14px;font-weight:600;cursor:pointer;
+  border:2px solid transparent;transition:all .25s;
+  box-shadow:var(--shadow);white-space:nowrap;
+}
+.nav-item.active{
+  background:var(--pink);color:#fff;border-color:var(--pink-dark);
+}
+.nav-item:active{transform:scale(.95);}
+
+/* 板块 */
+.section{display:none;padding:12px 16px;animation:fadeIn .3s ease;}
+.section.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* 卡片 */
+.card{
+  background:var(--card);border-radius:var(--radius);
+  padding:18px;margin-bottom:14px;box-shadow:var(--shadow);
+  transition:box-shadow .3s;
+}
+.card:active{box-shadow:var(--shadow-hover);}
+
+/* 列表项 - 汀洲前缀 */
+.list-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:12px 0;border-bottom:1px solid var(--pink-light);
+}
+.list-item:last-child{border-bottom:none;}
+.item-icon{font-size:20px;flex-shrink:0;line-height:1.5;}
+.item-content{flex:1;font-size:15px;}
+
+/* 按钮 */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:10px 20px;border-radius:30px;border:none;
+  font-size:14px;font-weight:600;cursor:pointer;
+  transition:all .2s;text-decoration:none;
+}
+.btn:active{transform:scale(.95);}
+.btn-primary{background:var(--pink);color:#fff;}
+.btn-primary:active{background:var(--pink-dark);}
+.btn-outline{background:transparent;color:var(--pink-dark);border:2px solid var(--pink);}
+.btn-yellow{background:var(--yellow);color:var(--text);}
+.btn-green{background:var(--green);color:#fff;}
+.btn-blue{background:var(--blue);color:#fff;}
+.btn-sm{padding:6px 14px;font-size:12px;}
+.btn-block{display:flex;width:100%;}
+
+/* 子导航 */
+.sub-nav{
+  display:flex;gap:8px;margin-bottom:14px;
+  background:var(--card);padding:6px;border-radius:30px;
+  box-shadow:var(--shadow);
+}
+.sub-nav-item{
+  flex:1;padding:8px;text-align:center;border-radius:24px;
+  font-size:13px;font-weight:600;color:var(--text-light);
+  cursor:pointer;transition:all .2s;
+}
+.sub-nav-item.active{background:var(--pink);color:#fff;}
+
+/* 题目 */
+.quiz-card{
+  background:var(--card);border-radius:var(--radius);
+  padding:16px;margin-bottom:12px;box-shadow:var(--shadow);
+  border-left:4px solid var(--pink);
+}
+.quiz-num{
+  display:inline-block;background:var(--pink);color:#fff;
+  font-size:12px;font-weight:700;padding:2px 10px;
+  border-radius:12px;margin-bottom:8px;
+}
+.quiz-q{font-size:15px;font-weight:600;margin-bottom:12px;line-height:1.7;}
+.quiz-options{display:flex;flex-direction:column;gap:8px;}
+.quiz-opt{
+  padding:10px 14px;background:var(--bg);border-radius:12px;
+  font-size:14px;cursor:pointer;transition:all .2s;
+  border:2px solid transparent;
+}
+.quiz-opt:active{transform:scale(.98);}
+.quiz-opt.correct{background:#d4edda;border-color:var(--green);color:#155724;}
+.quiz-opt.wrong{background:#f8d7da;border-color:#f5c6cb;color:#721c24;}
+.quiz-opt.selected{background:var(--pink-light);border-color:var(--pink);}
+.quiz-answer{
+  margin-top:10px;padding:12px;background:var(--yellow);
+  border-radius:12px;font-size:13px;display:none;
+}
+.quiz-answer.show{display:block;animation:fadeIn .3s;}
+
+/* 简答题 */
+.short-card{
+  background:var(--card);border-radius:var(--radius);
+  padding:16px;margin-bottom:12px;box-shadow:var(--shadow);
+  border-left:4px solid var(--orange);
+}
+.short-label{font-size:12px;color:var(--text-light);margin-bottom:4px;}
+.short-q{font-size:15px;font-weight:600;margin-bottom:12px;line-height:1.7;}
+.textarea{
+  width:100%;min-height:80px;padding:10px;border:2px solid var(--pink-light);
+  border-radius:12px;font-size:14px;font-family:inherit;
+  resize:vertical;background:var(--bg);color:var(--text);
+}
+.textarea:focus{outline:none;border-color:var(--pink);}
+.std-answer{
+  margin-top:10px;padding:12px;background:var(--pink-light);
+  border-radius:12px;font-size:13px;display:none;line-height:1.8;
+}
+.std-answer.show{display:block;animation:fadeIn .3s;}
+.std-answer-label{font-weight:700;color:var(--pink-dark);display:block;margin-bottom:4px;}
+
+/* 填空题 */
+.fill-card{
+  background:var(--card);border-radius:var(--radius);
+  padding:16px;margin-bottom:12px;box-shadow:var(--shadow);
+  border-left:4px solid var(--blue);
+}
+.fill-q{font-size:15px;line-height:2;margin-bottom:10px;}
+.fill-input{
+  display:inline-block;border:none;border-bottom:2px solid var(--pink);
+  background:var(--pink-light);padding:2px 8px;border-radius:4px 4px 0 0;
+  font-size:14px;min-width:60px;color:var(--text);font-family:inherit;
+  outline:none;
+}
+.fill-input:focus{background:var(--yellow);}
+.fill-result{margin-top:10px;font-size:13px;padding:8px 12px;border-radius:10px;display:none;}
+.fill-result.show{display:block;animation:fadeIn .3s;}
+.fill-result.pass{background:#d4edda;color:#155724;}
+.fill-result.fail{background:#f8d7da;color:#721c24;}
+
+/* 减脂餐 */
+.diet-summary{
+  background:linear-gradient(135deg,var(--green) 0%,#5cb88a 100%);
+  color:#fff;border-radius:var(--radius);padding:18px;
+  margin-bottom:14px;box-shadow:var(--shadow);
+}
+.diet-summary h3{font-size:18px;margin-bottom:8px;}
+.diet-cal{font-size:32px;font-weight:700;}
+.diet-cal small{font-size:14px;font-weight:400;}
+
+.meal-card{
+  background:var(--card);border-radius:var(--radius);
+  padding:16px;margin-bottom:12px;box-shadow:var(--shadow);
+}
+.meal-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.meal-icon{font-size:24px;}
+.meal-title{font-size:16px;font-weight:700;}
+.meal-cal{margin-left:auto;font-size:13px;color:var(--green);font-weight:600;}
+.meal-list{list-style:none;}
+.meal-list li{
+  display:flex;align-items:flex-start;gap:8px;
+  padding:6px 0;font-size:14px;
+}
+
+/* 食材输入 */
+.food-input-area{
+  background:var(--card);border-radius:var(--radius);
+  padding:16px;margin-bottom:14px;box-shadow:var(--shadow);
+}
+.food-input-area h3{font-size:16px;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.food-tags{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;min-height:36px;}
+.food-tag{
+  display:inline-flex;align-items:center;gap:4px;
+  background:var(--green);color:#fff;padding:5px 12px;
+  border-radius:20px;font-size:13px;
+}
+.food-tag .remove{cursor:pointer;font-weight:bold;opacity:.7;}
+.food-tag .remove:active{opacity:1;}
+.food-add{display:flex;gap:8px;margin-top:8px;}
+
+/* 健身打卡 */
+.fitness-overview{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;
+}
+.stat-card{
+  background:var(--card);border-radius:var(--radius);padding:14px;
+  box-shadow:var(--shadow);text-align:center;
+}
+.stat-icon{font-size:28px;margin-bottom:4px;}
+.stat-value{font-size:22px;font-weight:700;color:var(--pink-dark);}
+.stat-label{font-size:12px;color:var(--text-light);}
+
+.weight-input-area{
+  background:var(--card);border-radius:var(--radius);
+  padding:16px;margin-bottom:14px;box-shadow:var(--shadow);
+}
+.weight-input-area h3{font-size:16px;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.weight-form{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;}
+.weight-form .input-group{flex:1;min-width:120px;}
+.weight-form label{font-size:13px;color:var(--text-light);display:block;margin-bottom:4px;}
+.weight-form input,.weight-form select{
+  width:100%;padding:8px 12px;border:2px solid var(--pink-light);
+  border-radius:10px;font-size:14px;background:var(--bg);
+  color:var(--text);font-family:inherit;
+}
+.weight-form input:focus,.weight-form select:focus{outline:none;border-color:var(--pink);}
+
+/* 打卡列表 */
+.checkin-list{display:flex;flex-direction:column;gap:10px;}
+.checkin-item{
+  background:var(--card);border-radius:var(--radius);
+  padding:14px;box-shadow:var(--shadow);
+  display:flex;align-items:center;gap:10px;
+}
+.checkin-item .ci-icon{font-size:24px;}
+.checkin-item .ci-content{flex:1;}
+.checkin-item .ci-date{font-size:13px;color:var(--text-light);}
+.checkin-item .ci-detail{font-size:14px;font-weight:600;}
+.checkin-item .ci-del{
+  color:var(--text-light);font-size:18px;cursor:pointer;padding:4px;
+}
+
+/* 运动建议 */
+.advice-card{
+  background:linear-gradient(135deg,var(--blue) 0%,#5ab4d8 100%);
+  color:#fff;border-radius:var(--radius);padding:16px;
+  margin-bottom:14px;box-shadow:var(--shadow);
+}
+.advice-card h3{font-size:16px;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.advice-card .advice-content{font-size:14px;line-height:1.8;}
+.advice-actions{display:flex;gap:8px;margin-top:12px;}
+
+/* 手环数据 */
+.band-card{
+  background:var(--card);border-radius:var(--radius);
+  padding:16px;margin-bottom:14px;box-shadow:var(--shadow);
+  border-left:4px solid var(--blue);
+}
+.band-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;}
+.band-stat{text-align:center;padding:10px 6px;background:var(--bg);border-radius:10px;}
+.band-stat .bs-val{font-size:18px;font-weight:700;color:var(--blue);}
+.band-stat .bs-lbl{font-size:11px;color:var(--text-light);}
+
+/* 空状态 */
+.empty{text-align:center;padding:40px 20px;color:var(--text-light);}
+.empty-icon{font-size:48px;margin-bottom:10px;}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:30px;left:50%;transform:translateX(-50%);
+  background:rgba(74,51,64,.92);color:#fff;padding:10px 24px;
+  border-radius:30px;font-size:14px;z-index:9999;
+  opacity:0;transition:opacity .3s,transform .3s;
+  pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
+
+/* 工具栏 */
+.toolbar{
+  display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;
+}
+.toolbar .btn{flex:1;min-width:100px;}
+
+/* 分隔标题 */
+.section-title{
+  font-size:18px;font-weight:700;margin:18px 0 12px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-title .st-icon{font-size:22px;}
+
+/* 小新提示 */
+.hint{
+  font-size:12px;color:var(--text-light);
+  padding:8px 12px;background:var(--pink-light);
+  border-radius:10px;margin-top:8px;line-height:1.6;
+}
+
+/* 进度条 */
+.progress-bar{
+  height:8px;background:var(--pink-light);border-radius:4px;
+  overflow:hidden;margin:8px 0;
+}
+.progress-fill{
+  height:100%;background:linear-gradient(90deg,var(--pink),var(--green));
+  border-radius:4px;transition:width .5s;
+}
+
+@media(max-width:380px){
+  .header h1{font-size:19px;}
+  .quiz-q,.short-q{font-size:14px;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-avatar">🎀</div>
+  <h1>汀洲工作台</h1>
+  <p>教资备考 · 减脂餐搭配 · 健身打卡</p>
+  <div class="date" id="todayDate"></div>
+</div>
+
+<div class="nav">
+  <div class="nav-item active" onclick="switchSection('exam', this)">🎀 教资考试</div>
+  <div class="nav-item" onclick="switchSection('diet', this)">🎀 减脂餐</div>
+  <div class="nav-item" onclick="switchSection('fitness', this)">🎀 健身打卡</div>
+</div>
+
+<!-- ========== 教资考试 ========== -->
+<div class="section active" id="section-exam">
+  <div class="sub-nav" id="examSubNav">
+    <div class="sub-nav-item active" onclick="switchExamTab('zhsz')">综合素质</div>
+    <div class="sub-nav-item" onclick="switchExamTab('jyzs')">教育知识与能力</div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn btn-primary btn-sm" onclick="refreshQuestions('choice')">🎀 刷新选择题</button>
+    <button class="btn btn-outline btn-sm" onclick="refreshQuestions('short')">🎀 刷新简答题</button>
+    <button class="btn btn-yellow btn-sm" onclick="goFill()">🎀 复习默写</button>
+    <button class="btn btn-green btn-sm" onclick="toggleWrongBook()">🎀 错题本<span id="wrongCount" style="margin-left:4px;font-size:11px;background:#fff3;color:#fff;padding:1px 6px;border-radius:10px;"></span></button>
+  </div>
+
+  <!-- 选择题区 -->
+  <div id="choiceArea"></div>
+
+  <!-- 简答题区 -->
+  <div class="section-title" id="shortTitle"><span class="st-icon">🎀</span>简答题（写完对照标准答案）</div>
+  <div id="shortArea"></div>
+
+  <!-- 填空默写区 -->
+  <div id="fillArea" style="display:none;">
+    <div class="section-title"><span class="st-icon">🎀</span>复习默写填空（检查昨日背诵）</div>
+    <div class="toolbar">
+      <button class="btn btn-blue btn-sm" onclick="checkAllFill()">🎀 全部批改</button>
+      <button class="btn btn-outline btn-sm" onclick="refreshFill()">🎀 换一组</button>
+    </div>
+    <div id="fillContent"></div>
+  </div>
+
+  <!-- 错题本面板 -->
+  <div id="wrongArea" style="display:none;">
+    <div class="section-title"><span class="st-icon">🎀</span>错题本（答错的题自动收录）</div>
+    <div class="toolbar">
+      <button class="btn btn-primary btn-sm" onclick="retryAllWrong()">🎀 全部重做</button>
+      <button class="btn btn-outline btn-sm" onclick="clearWrongBook()">🎀 清空错题本</button>
+      <button class="btn btn-yellow btn-sm" onclick="toggleWrongBook()">🎀 收起</button>
+    </div>
+    <div id="wrongContent"></div>
+  </div>
+</div>
+
+<!-- ========== 减脂餐 ========== -->
+<div class="section" id="section-diet">
+  <div class="food-input-area">
+    <h3>🎀 告诉小新你家冰箱有啥</h3>
+    <div class="hint">输入食材后点击添加，小新会根据食材为你搭配一日三餐～</div>
+    <div class="food-tags" id="foodTags"></div>
+    <div class="food-add">
+      <input type="text" id="foodInput" class="textarea" style="min-height:40px;flex:1;" placeholder="如：鸡胸肉、西兰花、鸡蛋..." onkeydown="if(event.key==='Enter')addFood()">
+      <button class="btn btn-green btn-sm" onclick="addFood()">🎀 添加</button>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-primary btn-sm" onclick="generateDiet()">🎀 生成今日食谱</button>
+      <button class="btn btn-outline btn-sm" onclick="clearFood()">清空</button>
+    </div>
+  </div>
+
+  <div id="dietResult"></div>
+</div>
+
+<!-- ========== 健身打卡 ========== -->
+<div class="section" id="section-fitness">
+  <div class="fitness-overview">
+    <div class="stat-card">
+      <div class="stat-icon">🎀</div>
+      <div class="stat-value" id="totalCheckins">0</div>
+      <div class="stat-label">累计打卡</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🎀</div>
+      <div class="stat-value" id="latestWeight">--</div>
+      <div class="stat-label">最新体重(kg)</div>
+    </div>
+  </div>
+
+  <!-- 体重记录 -->
+  <div class="weight-input-area">
+    <h3>🎀 记录今日打卡</h3>
+    <div class="weight-form">
+      <div class="input-group">
+        <label>运动项目</label>
+        <input type="text" id="exName" placeholder="如：跑步、瑜伽、力量训练">
+      </div>
+      <div class="input-group">
+        <label>时长(分钟)</label>
+        <input type="number" id="exDuration" placeholder="如：30">
+      </div>
+      <div class="input-group">
+        <label>消耗热量(kcal)</label>
+        <input type="number" id="exCal" placeholder="如：200">
+      </div>
+    </div>
+    <div class="weight-form" style="margin-top:8px;">
+      <div class="input-group">
+        <label>今日体重(kg)</label>
+        <input type="number" id="exWeight" step="0.1" placeholder="如：58.5">
+      </div>
+      <div class="input-group">
+        <label>运动强度</label>
+        <select id="exIntensity">
+          <option value="轻松">轻松</option>
+          <option value="适中" selected>适中</option>
+          <option value="高强度">高强度</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="addCheckin()" style="flex:0 0 auto;">🎀 打卡</button>
+    </div>
+  </div>
+
+  <!-- 小米手环数据 -->
+  <div class="band-card">
+    <h3 style="font-size:16px;display:flex;align-items:center;gap:6px;">🎀 小米手环数据</h3>
+    <div class="hint" id="bandHint">点击下方按钮同步手环数据（步数、热量、睡眠）</div>
+    <div class="band-grid" id="bandGrid" style="display:none;">
+      <div class="band-stat"><div class="bs-val" id="bandSteps">--</div><div class="bs-lbl">步数</div></div>
+      <div class="band-stat"><div class="bs-val" id="bandCal">--</div><div class="bs-lbl">消耗(kcal)</div></div>
+      <div class="band-stat"><div class="bs-val" id="bandSleep">--</div><div class="bs-lbl">睡眠(h)</div></div>
+    </div>
+    <button class="btn btn-blue btn-sm btn-block" style="margin-top:10px;" onclick="syncBand()">🎀 同步手环数据</button>
+    <div id="bandAdvice" style="margin-top:10px;display:none;"></div>
+  </div>
+
+  <!-- 运动建议 -->
+  <div id="adviceArea"></div>
+
+  <!-- 打卡历史 -->
+  <div class="section-title"><span class="st-icon">🎀</span>打卡记录</div>
+  <div class="checkin-list" id="checkinList"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== 题库数据 =====
+const QUESTIONS = {"zhsz_choice": [{"q": "教师在教育教学中应当平等对待学生，关注学生的（），因材施教，促进学生的充分发展。", "options": ["A.性格差异", "B.个体差异", "C.心理差异", "D.智力差异"], "a": "B", "analysis": "《教师法》规定教师应平等对待学生，关注个体差异，因材施教。个体差异包括性格、兴趣、能力等方面的差异，是因材施教的依据。"}, {"q": "《义务教育法》规定，义务教育实行（）管理体制。", "options": ["A.国务院领导，地方负责，分级管理", "B.省级统一管理", "C.市级统一管理", "D.县级统一管理"], "a": "A", "analysis": "《义务教育法》第七条规定：义务教育实行国务院领导，省、自治区、直辖市人民政府统筹规划实施，县级人民政府为主管理的体制。"}, {"q": "素质教育是以（）为根本宗旨。", "options": ["A.提高国民素质", "B.培养创新人才", "C.促进学生全面发展", "D.提高教育质量"], "a": "A", "analysis": "素质教育以\"提高国民素质\"为根本宗旨，这是素质教育的核心目标，强调面向全体学生，促进学生全面发展。"}, {"q": "教师职业道德的核心是（）。", "options": ["A.爱岗敬业", "B.关爱学生", "C.为人师表", "D.教书育人"], "a": "B", "analysis": "教师职业道德的核心是\"关爱学生\"。\"关爱学生\"要求教师关心爱护全体学生，尊重学生人格，平等公正对待学生。"}, {"q": "《教师法》规定，教师享有按时获取工资报酬，享受国家规定的福利待遇以及（）的权利。", "options": ["A.寒暑假期的带薪休假", "B.双休日带薪休假", "C.法定节假日带薪休假", "D.以上都是"], "a": "A", "analysis": "《教师法》第七条明确规定教师享有\"按时获取工资报酬，享受国家规定的福利待遇以及寒暑假期的带薪休假\"的权利。"}, {"q": "下列哪项不属于素质教育的基本特征？（）", "options": ["A.全体性", "B.基础性", "C.精英性", "D.发展性"], "a": "C", "analysis": "素质教育的基本特征包括全体性、基础性、发展性、主体性、全面性等。\"精英性\"是应试教育的特征，不是素质教育的特征。"}, {"q": "教师在教学过程中起（）作用。", "options": ["A.主导", "B.主体", "C.决定", "D.辅助"], "a": "A", "analysis": "在教学过程中，教师起主导作用，学生是学习的主体。教师主导作用与学生主体地位是统一的。"}, {"q": "\"其身正，不令而行；其身不正，虽令不从\"体现了教师劳动的（）特点。", "options": ["A.复杂性", "B.示范性", "C.长期性", "D.创造性"], "a": "B", "analysis": "\"其身正，不令而行；其身不正，虽令不从\"强调教师以身作则的重要性，体现了教师劳动的示范性特点。"}, {"q": "下列哪项不属于《中小学教师职业道德规范》的内容？（）", "options": ["A.爱国守法", "B.爱岗敬业", "C.追求卓越", "D.教书育人"], "a": "C", "analysis": "《中小学教师职业道德规范》（2008年修订）包括：爱国守法、爱岗敬业、关爱学生、教书育人、为人师表、终身学习。不含\"追求卓越\"。"}, {"q": "新课程改革的核心理念是（）。", "options": ["A.以学生发展为本", "B.以教师发展为本", "C.以学校发展为本", "D.以课程发展为本"], "a": "A", "analysis": "新课程改革的核心理念是\"以学生发展为本\"，强调一切为了学生的发展，关注学生的全面发展和个性发展。"}, {"q": "教师对学生的爱应当是（）。", "options": ["A.偏爱优等生", "B.博爱全体学生", "C.只爱听话的学生", "D.只爱漂亮的学生"], "a": "B", "analysis": "教师对学生的爱应当是博爱，即关爱全体学生，不是偏爱某一部分学生。这是教师职业道德的基本要求。"}, {"q": "《未成年人保护法》规定，学校应当尊重未成年学生的（），不得随意开除。", "options": ["A.人身自由", "B.受教育权", "C.隐私权", "D.名誉权"], "a": "B", "analysis": "《未成年人保护法》第十八条规定：学校应当尊重未成年学生受教育的权利，关心、爱护学生，对品行有缺点、学习有困难的学生，应当耐心教育、帮助，不得歧视，不得违反法律和国家规定开除未成年学生。"}, {"q": "下列关于素质教育与应试教育的区别，说法错误的是（）。", "options": ["A.素质教育面向全体学生", "B.应试教育面向少数学生", "C.素质教育注重全面发展", "D.应试教育更注重创新能力"], "a": "D", "analysis": "应试教育以考试成绩为唯一目标，不注重创新能力培养。注重创新能力是素质教育的特征，不是应试教育的特征。"}, {"q": "教师的专业能力不包括（）。", "options": ["A.教学设计能力", "B.课堂管理能力", "C.市场营销能力", "D.教育科研能力"], "a": "C", "analysis": "教师的专业能力包括教学设计能力、课堂管理能力、教育科研能力、教学评价能力等。市场营销能力不属于教师专业能力。"}, {"q": "\"学而不思则罔，思而不学则殆\"体现了（）的教学思想。", "options": ["A.孔子", "B.孟子", "C.荀子", "D.老子"], "a": "A", "analysis": "\"学而不思则罔，思而不学则殆\"出自《论语》，是孔子的教学思想，强调学思结合。"}, {"q": "下列哪项是教师享有的权利？（）", "options": ["A.进行教育教学活动", "B.完成规定教学任务", "C.遵守规章制度", "D.提高思想政治觉悟"], "a": "A", "analysis": "A选项\"进行教育教学活动\"是教师的权利，BCD均为教师的义务。"}, {"q": "评价教师教育教学工作的根本标准是（）。", "options": ["A.学生考试成绩", "B.学生的发展", "C.家长的满意度", "D.领导的评价"], "a": "B", "analysis": "评价教师教育教学工作的根本标准是学生的发展，即学生在知识、能力、品德等方面的进步和发展。"}, {"q": "《教育法》规定，教育活动必须符合（）利益。", "options": ["A.个人", "B.集体", "C.国家和社会公共利益", "D.学校"], "a": "C", "analysis": "《教育法》第八条规定：教育活动必须符合国家和社会公共利益。这是教育公共性原则的体现。"}, {"q": "教师劳动的创造性主要体现在（）。", "options": ["A.因材施教", "B.教学方法的创新", "C.教育机智", "D.以上都是"], "a": "D", "analysis": "教师劳动的创造性主要体现在因材施教、教学方法的不断创新、教育机智的运用等方面。"}, {"q": "下列关于教师职业的认识，正确的是（）。", "options": ["A.教师是一种专门职业", "B.教师是半职业", "C.教师是非职业", "D.教师是临时职业"], "a": "A", "analysis": "教师是一种专门职业，需要经过专门训练，具备专业知识和专业能力，获得教师资格证书后方可任职。"}, {"q": "\"十年树木，百年树人\"体现了教师劳动的（）特点。", "options": ["A.复杂性", "B.长期性", "C.创造性", "D.示范性"], "a": "B", "analysis": "\"十年树木，百年树人\"说明培养人是一个长期的过程，体现了教师劳动的长期性特点。"}, {"q": "素质教育的重点是培养学生的（）和（）。", "options": ["A.创新精神、实践能力", "B.考试能力、记忆能力", "C.听话能力、服从能力", "D.竞争能力、淘汰能力"], "a": "A", "analysis": "素质教育的重点是培养创新精神和实践能力，这是素质教育区别于应试教育的核心所在。"}, {"q": "教师在与家长沟通时应当（）。", "options": ["A.居高临下", "B.平等尊重", "C.推卸责任", "D.敷衍了事"], "a": "B", "analysis": "教师在与家长沟通时应平等尊重，建立平等的合作伙伴关系，共同促进学生的健康发展。"}, {"q": "下列哪项不属于教师的义务？（）", "options": ["A.遵守宪法法律", "B.贯彻教育方针", "C.获取工资报酬", "D.提高业务水平"], "a": "C", "analysis": "ABD均为教师的义务，C\"获取工资报酬\"是教师的权利而非义务。"}, {"q": "《义务教育法》规定，国家实行（）年义务教育制度。", "options": ["A.六", "B.九", "C.十二", "D.十五"], "a": "B", "analysis": "《义务教育法》第二条规定：国家实行九年义务教育制度。义务教育是国家统一实施的所有适龄儿童、少年必须接受的教育。"}], "zhsz_short": [{"q": "简述素质教育的内涵。", "a": "①素质教育是面向全体学生的教育；②素质教育是促进学生全面发展的教育；③素质教育是促进学生个性发展的教育；④素质教育是以培养创新精神和实践能力为重点的教育。"}, {"q": "简述教师职业道德规范的主要内容。", "a": "①爱国守法；②爱岗敬业；③关爱学生；④教书育人；⑤为人师表；⑥终身学习。"}, {"q": "简述新课程改革的具体目标。", "a": "①实现课程功能的转变；②体现课程结构的均衡性、综合性和选择性；③密切课程内容与生活和时代的联系；④改善学生的学习方式；⑤建立与素质教育理念相一致的评价与考试制度；⑥实行三级课程管理制度。"}, {"q": "简述教师劳动的特点。", "a": "①复杂性和创造性；②连续性和广延性；③长期性和间接性；④主体性和示范性；⑤个体性和群体性。"}, {"q": "简述教师应具备的专业素养。", "a": "①职业道德素养：热爱教育事业、关爱学生等；②知识素养：政治理论修养、精深的学科专业知识、广博的科学文化知识、必备的教育科学知识；③能力素养：语言表达能力、教育教学能力、组织管理能力、自我调控能力等。"}, {"q": "简述《教师法》中规定的教师权利。", "a": "①进行教育教学活动，开展教育教学改革和实验；②从事科学研究、学术交流，参加专业的学术团体；③指导学生的学习和发展，评定学生的品行和学业成绩；④按时获取工资报酬，享受国家规定的福利待遇以及寒暑假期的带薪休假；⑤对学校教育教学管理工作提出意见和建议；⑥参加进修或者其他方式的培训。"}, {"q": "简述如何建立良好的师生关系。", "a": "①了解和研究学生；②树立正确的学生观；③提高教师自身的素质；④发扬教育民主；⑤热爱、尊重学生，公平对待学生；⑥主动与学生沟通，善于与学生交往。"}, {"q": "简述教学过程的基本规律。", "a": "①间接经验与直接经验相结合的规律；②掌握知识与发展智力相统一的规律；③传授知识与思想品德教育相统一的规律；④教师主导作用与学生主体作用相统一的规律。"}, {"q": "简述教育的本质属性。", "a": "教育是有目的地培养人的社会活动。这一属性包含：①教育是人类所特有的社会现象；②教育是有意识、有目的、自觉地对受教育者进行培养的过程；③在教育这种活动中，存在着教育者、受教育者以及教育影响三种要素之间的相互关系。"}, {"q": "简述小学教育的基本特征。", "a": "①全民性：面向全体适龄儿童；②义务性：国家、社会、学校和家庭必须予以保证；③全面性：促进学生在德智体美劳等方面全面发展；④基础性：为学生的终身发展奠定基础。"}], "zhsz_fill": [{"q": "素质教育是以培养___精神和___能力为重点的教育。", "a": ["创新", "实践"]}, {"q": "教师职业道德的核心是___。", "a": ["关爱学生"]}, {"q": "新课程改革的核心理念是___。", "a": ["以学生发展为本"]}, {"q": "教师劳动的特点包括复杂性、___、连续性、广延性、___、间接性、主体性、示范性、___和群体性。", "a": ["创造性", "长期性", "个体性"]}, {"q": "《中小学教师职业道德规范》包括爱国守法、___、___、教书育人、___、终身学习。", "a": ["爱岗敬业", "关爱学生", "为人师表"]}, {"q": "教师专业素养包括___素养、___素养和___素养。", "a": ["职业道德", "知识", "能力"]}, {"q": "师生关系的基本类型包括___关系、___关系和___关系。", "a": ["教育", "心理", "伦理"]}, {"q": "教学过程的基本规律：___与___相结合、掌握知识与发展___相统一、传授知识与___相统一、___与___相统一。", "a": ["间接经验", "直接经验", "智力", "思想品德教育", "教师主导作用", "学生主体作用"]}, {"q": "我国义务教育实行___年制。", "a": ["九"]}, {"q": "教育三要素是___、___和___。", "a": ["教育者", "受教育者", "教育影响"]}], "jyzs_choice": [{"q": "教育起源于（）。", "options": ["A.神话起源说", "B.生物起源说", "C.心理起源说", "D.劳动起源说"], "a": "D", "analysis": "劳动起源说（社会起源说）认为教育起源于劳动，起源于劳动过程中社会生产需要和人的发展需要的辩证统一。这是马克思主义的教育起源观。"}, {"q": "古希腊提出\"产婆术\"的教育家是（）。", "options": ["A.柏拉图", "B.苏格拉底", "C.亚里士多德", "D.昆体良"], "a": "B", "analysis": "苏格拉底提出的\"产婆术\"（助产术）是一种启发式教学方法，通过问答方式引导学生自己得出结论。柏拉图是苏格拉底的学生。"}, {"q": "中国最早的教育专著是（）。", "options": ["A.《论语》", "B.《学记》", "C.《大学》", "D.《中庸》"], "a": "B", "analysis": "《学记》是中国古代最早的教育专著，也是世界上最早的教育文献，成书于战国后期，比古罗马昆体良的《论演说家的教育》早三百多年。"}, {"q": "提出\"教育即生活\"的教育家是（）。", "options": ["A.赫尔巴特", "B.杜威", "C.夸美纽斯", "D.卢梭"], "a": "B", "analysis": "杜威提出\"教育即生活\"\"教育即生长\"\"教育即经验的改造\"，主张\"做中学\"，是实用主义教育思想的代表人物。"}, {"q": "心理学作为一门独立的科学，诞生于（）年。", "options": ["A.1879", "B.1789", "C.1897", "D.1900"], "a": "A", "analysis": "1879年，冯特在德国莱比锡大学建立了世界上第一个心理学实验室，标志着心理学成为一门独立的科学。"}, {"q": "格式塔心理学认为学习的本质是（）。", "options": ["A.形成联结", "B.形成条件反射", "C.顿悟", "D.尝试错误"], "a": "C", "analysis": "格式塔心理学（完形心理学）认为学习的本质是\"顿悟\"，即突然理解了问题情境中各要素之间的关系。与桑代克的试误说相对。"}, {"q": "皮亚杰认为儿童认知发展的第三个阶段是（）。", "options": ["A.感知运动阶段", "B.前运算阶段", "C.具体运算阶段", "D.形式运算阶段"], "a": "C", "analysis": "皮亚杰将儿童认知发展分为四个阶段：感知运动阶段（0-2岁）、前运算阶段（2-7岁）、具体运算阶段（7-11岁）、形式运算阶段（11岁以后）。第三个阶段是具体运算阶段。"}, {"q": "维果斯基提出的理论是（）。", "options": ["A.最近发展区", "B.认知发展阶段", "C.道德发展阶段", "D.需要层次理论"], "a": "A", "analysis": "维果斯基提出\"最近发展区\"理论，认为儿童有两种发展水平：现有水平和潜在水平，两者之间的区域即为最近发展区。"}, {"q": "以下哪种学习动机属于内部动机？（）", "options": ["A.为了获得奖励", "B.为了避免惩罚", "C.对学习内容感兴趣", "D.为了得到好评"], "a": "C", "analysis": "内部动机是由个体内在需要引起的动机，如对学习内容本身感兴趣。外部动机是由外部奖励或惩罚引起的，如为了获得奖励或避免惩罚。"}, {"q": "奥苏贝尔将有意义学习分为（）。", "options": ["A.符号学习、概念学习、命题学习", "B.信号学习、刺激-反应学习", "C.连锁学习、言语联想学习", "D.辨别学习、规则学习"], "a": "A", "analysis": "奥苏贝尔将有意义学习分为：符号学习（代表学习）、概念学习、命题学习。这是根据学习材料的复杂程度划分的。"}, {"q": "下列哪种记忆保持时间最长？（）", "options": ["A.感觉记忆", "B.短时记忆", "C.长时记忆", "D.工作记忆"], "a": "C", "analysis": "感觉记忆保持时间极短（0.25-2秒），短时记忆保持时间较短（5秒-2分钟），长时记忆保持时间最长（一分钟以上到终身）。"}, {"q": "遗忘的进程是（）。", "options": ["A.先快后慢", "B.先慢后快", "C.均匀遗忘", "D.不遗忘"], "a": "A", "analysis": "根据艾宾浩斯遗忘曲线，遗忘的进程是不均衡的，表现为\"先快后慢\"的趋势，即遗忘在学习之后立即开始，最初遗忘得快，后来逐渐减慢。"}, {"q": "下列哪种迁移属于正迁移？（）", "options": ["A.学习英语有助于学习法语", "B.学习日语干扰学习汉语", "C.学习骑自行车干扰学习三轮车", "D.学习打篮球干扰学习打排球"], "a": "A", "analysis": "正迁移是指一种学习对另一种学习产生积极的促进作用。学习英语有助于学习法语属于正迁移。BCD均为负迁移。"}, {"q": "心智技能形成的最后阶段是（）。", "options": ["A.原型定向", "B.原型操作", "C.原型内化", "D.原型模仿"], "a": "C", "analysis": "心智技能形成分为三个阶段：原型定向、原型操作、原型内化。原型内化是最后阶段，即心智活动的实践模式向头脑内部转化。"}, {"q": "下列哪种教学方法属于以引导探究为主的方法？（）", "options": ["A.讲授法", "B.讨论法", "C.发现法", "D.练习法"], "a": "C", "analysis": "发现法是以引导探究为主的教学方法，由布鲁纳倡导，强调学生通过自己的探索和发现来学习。讲授法是传授为主，练习法是训练为主。"}, {"q": "教学工作的中心环节是（）。", "options": ["A.备课", "B.上课", "C.作业布置与批改", "D.课外辅导"], "a": "B", "analysis": "上课是教学工作的中心环节。备课是上课的前提，作业布置与批改、课外辅导、学业成绩检查都是上课的延续和补充。"}, {"q": "班主任工作的中心任务是（）。", "options": ["A.组建班级组织", "B.协调各方面教育影响", "C.促进全班学生全面发展", "D.做好个别教育工作"], "a": "C", "analysis": "班主任工作的中心任务是促进全班学生全面发展。组建班级组织、协调教育影响、个别教育都是为这个中心任务服务的。"}, {"q": "下列哪种心理现象属于个性心理特征？（）", "options": ["A.能力", "B.需要", "C.动机", "D.兴趣"], "a": "A", "analysis": "个性心理特征包括能力、气质、性格。需要、动机、兴趣属于个性心理倾向性。"}, {"q": "注意的两个基本特征是（）。", "options": ["A.指向性和集中性", "B.选择性和持续性", "C.稳定性和分配性", "D.转移和分配"], "a": "A", "analysis": "注意的两个基本特征是指向性和集中性。指向性是指心理活动选择某一对象；集中性是指心理活动停留在一定对象上的强度。"}, {"q": "情绪的三种基本状态是（）。", "options": ["A.心境、激情、应激", "B.快乐、愤怒、悲哀", "C.喜欢、厌恶、恐惧", "D.道德感、理智感、美感"], "a": "A", "analysis": "情绪的三种基本状态是心境（微弱而持久的情绪状态）、激情（短暂而强烈的情绪状态）、应激（在紧急情况下的情绪状态）。"}, {"q": "下列哪位学者提出了需要层次理论？（）", "options": ["A.马斯洛", "B.罗杰斯", "C.皮亚杰", "D.布鲁纳"], "a": "A", "analysis": "马斯洛提出需要层次理论，将人的需要从低到高分为：生理需要、安全需要、归属与爱的需要、尊重需要、自我实现需要。"}, {"q": "根据艾宾浩斯遗忘曲线，复习应当（）。", "options": ["A.及时复习", "B.延迟复习", "C.不复习", "D.考前突击"], "a": "A", "analysis": "根据艾宾浩斯遗忘曲线\"先快后慢\"的规律，复习应当及时进行，在学习之后尽快复习，以防止大量遗忘。"}, {"q": "课堂管理的基本功能是（）。", "options": ["A.维持课堂秩序", "B.促进课堂生长", "C.提高教学效率", "D.以上都是"], "a": "D", "analysis": "课堂管理的基本功能包括：维持课堂秩序（促进教学顺利进行）、促进课堂生长（促进学生发展）、提高教学效率，三者缺一不可。"}, {"q": "衡量一个班级集体是否形成的重要标志是（）。", "options": ["A.有明确的共同目标", "B.有坚强的领导核心", "C.有严格的规章制度", "D.有正确的集体舆论"], "a": "D", "analysis": "正确的集体舆论是衡量班集体是否形成的重要标志。共同目标、领导核心、规章制度虽然重要，但只有形成正确的集体舆论，班集体才算真正形成。"}, {"q": "教育目的的核心部分是（）。", "options": ["A.规定教育要培养什么样的人", "B.规定教育的性质", "C.规定教育的方向", "D.规定教育的任务"], "a": "A", "analysis": "教育目的的核心部分是\"规定教育要培养什么样的人\"，即培养目标。规定了人才培养的质量规格。"}], "jyzs_short": [{"q": "简述教育的功能。", "a": "①按教育作用的对象分：个体发展功能和社会发展功能；②按教育作用的性质分：正向功能和负向功能；③按教育作用的呈现形式分：显性功能和隐性功能。"}, {"q": "简述影响人身心发展的因素。", "a": "①遗传：为人的发展提供物质基础和生理前提；②环境：为人的发展提供外部条件；③教育（学校教育）：在人的发展中起主导作用；④个体的主观能动性：是人身心发展的内在动力。"}, {"q": "简述学校教育在人的身心发展中起主导作用的原因。", "a": "①学校教育是有目的、有计划、有组织地培养人的活动；②学校教育由受过专门训练的教师来实施；③学校教育能有效地控制、影响学生发展的各种因素；④学校教育对人的影响比较全面、系统和深刻。"}, {"q": "简述教学工作的基本环节。", "a": "①备课：钻研教材、了解学生、设计教法；②上课：教学工作的中心环节；③作业的布置与批改；④课外辅导；⑤学生学业成绩的检查与评定。"}, {"q": "简述启发性教学原则的含义及要求。", "a": "含义：在教学中教师要承认学生是学习的主体，注意调动他们的学习主动性，引导他们独立思考，积极探索，生动活泼地学习。要求：①加强学习的目的性教育；②启发学生独立思考；③让学生动手，培养独立解决问题的能力；④发扬教学民主。"}, {"q": "简述班主任如何组建和培养班集体。", "a": "①确立明确的奋斗目标；②选择和培养班干部；③培养正确的集体舆论和优良的班风；④组织多样的教育活动；⑤建立班集体的核心团队。"}, {"q": "简述皮亚杰的儿童认知发展阶段理论。", "a": "①感知运动阶段（0-2岁）：通过感觉和动作认识世界；②前运算阶段（2-7岁）：具有表象思维，但思维具有自我中心性；③具体运算阶段（7-11岁）：具有守恒性和可逆性；④形式运算阶段（11岁以后）：能进行抽象逻辑思维。"}, {"q": "简述如何激发学生的学习动机。", "a": "①创设问题情境，激发求知欲；②利用学习结果的反馈作用；③进行适当的竞赛；④正确运用表扬与批评；⑤合理设置课堂目标。"}, {"q": "简述学习策略的类型。", "a": "①认知策略：包括复述策略、精加工策略、组织策略；②元认知策略：包括计划策略、监控策略、调节策略；③资源管理策略：包括时间管理、学习环境管理、努力管理、他人支持。"}, {"q": "简述构建良好师生关系的途径与方法。", "a": "①了解和研究学生；②树立正确的学生观；③提高教师自身素质；④发扬教育民主；⑤热爱、尊重学生，公平对待学生；⑥主动与学生沟通，善于与学生交往。"}], "jyzs_fill": [{"q": "教育起源于___。", "a": ["劳动"]}, {"q": "提出\"产婆术\"的教育家是___。", "a": ["苏格拉底"]}, {"q": "中国最早的教育专著是《___》。", "a": ["学记"]}, {"q": "提出\"教育即生活\"的教育家是___。", "a": ["杜威"]}, {"q": "心理学诞生的标志是1879年___在莱比锡大学建立心理学实验室。", "a": ["冯特"]}, {"q": "皮亚杰将儿童认知发展分为四个阶段：___、___、___、___。", "a": ["感知运动阶段", "前运算阶段", "具体运算阶段", "形式运算阶段"]}, {"q": "维果斯基提出的理论是___。", "a": ["最近发展区"]}, {"q": "注意的两个基本特征是___和___。", "a": ["指向性", "集中性"]}, {"q": "记忆的三种类型是___、___、___。", "a": ["感觉记忆", "短时记忆", "长时记忆"]}, {"q": "遗忘的规律是___。", "a": ["先快后慢"]}]};;
+
+// ===== 状态管理 =====
+let currentExamTab = 'zhsz';
+let currentChoiceIdx = [];
+let currentShortIdx = [];
+let currentFillIdx = [];
+
+// ===== 日期 =====
+function initDate(){
+  const d = new Date();
+  const days = ['日','一','二','三','四','五','六'];
+  document.getElementById('todayDate').textContent = 
+    `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 星期${days[d.getDay()]}`;
+}
+
+// ===== Toast =====
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = '🎀 ' + msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+// ===== 板块切换 =====
+function switchSection(name, el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('section-'+name).classList.add('active');
+  if(el) el.classList.add('active');
+  if(name==='fitness') renderCheckins();
+}
+
+// ===== 教资考试 =====
+function switchExamTab(tab){
+  currentExamTab = tab;
+  document.querySelectorAll('#examSubNav .sub-nav-item').forEach((el,i)=>{
+    el.classList.toggle('active', (tab==='zhsz'&&i===0)||(tab==='jyzs'&&i===1));
+  });
+  // 恢复上次题目，没有才刷新
+  restoreOrRefresh('choice');
+  restoreOrRefresh('short');
+}
+
+function restoreOrRefresh(type){
+  const saved = localStorage.getItem('exam_'+currentExamTab+'_'+type);
+  if(saved){
+    try{
+      const data = JSON.parse(saved);
+      if(type==='choice'){
+        currentChoiceIdx = data;
+        renderChoice();
+      } else {
+        currentShortIdx = data;
+        renderShort();
+      }
+      return;
+    }catch(e){}
+  }
+  // 没有保存过的题目，才刷新
+  refreshQuestions(type);
+}
+
+function refreshQuestions(type){
+  if(type==='choice'){
+    const pool = QUESTIONS[currentExamTab+'_choice'];
+    const shuffled = [...pool].sort(()=>Math.random()-0.5).slice(0,20);
+    // 每道题加userAnswer字段
+    shuffled.forEach(q=>q.userAnswer=null);
+    currentChoiceIdx = shuffled;
+    localStorage.setItem('exam_'+currentExamTab+'_choice', JSON.stringify(currentChoiceIdx));
+    renderChoice();
+  } else if(type==='short'){
+    const pool = QUESTIONS[currentExamTab+'_short'];
+    const shuffled = [...pool].sort(()=>Math.random()-0.5).slice(0,20);
+    currentShortIdx = shuffled;
+    localStorage.setItem('exam_'+currentExamTab+'_short', JSON.stringify(currentShortIdx));
+    renderShort();
+  }
+  toast('已刷新'+(type==='choice'?'选择题':'简答题'));
+}
+
+function saveChoiceState(){
+  localStorage.setItem('exam_'+currentExamTab+'_choice', JSON.stringify(currentChoiceIdx));
+}
+
+function renderChoice(){
+  const area = document.getElementById('choiceArea');
+  let html = '<div class="section-title"><span class="st-icon">🎀</span>每日选择题（'+currentChoiceIdx.length+'道）</div>';
+  currentChoiceIdx.forEach((q,i)=>{
+    let opts = '';
+    q.options.forEach((opt,j)=>{
+      const letter = opt.charAt(0);
+      opts += '<div class="quiz-opt" onclick="selectChoice('+i+',\''+letter+'\','+j+')">'+opt+'</div>';
+    });
+    html += '<div class="quiz-card" id="qcard_'+i+'">'+
+      '<span class="quiz-num">🎀 第'+(i+1)+'题</span>'+
+      '<div class="quiz-q">'+q.q+'</div>'+
+      '<div class="quiz-options" id="opts_'+i+'">'+opts+'</div>'+
+      '<div class="quiz-answer" id="ans_'+i+'">'+
+        '<b>🎀 参考答案：'+q.a+'</b>'+
+        '<div style="margin-top:6px;font-weight:normal;">🎀 解析：'+q.analysis+'</div>'+
+      '</div>'+
+      '<div style="margin-top:8px;display:none;" id="retry_'+i+'">'+
+        '<button class="btn btn-outline btn-sm" onclick="retryChoice('+i+')">🎀 重新生成本题</button>'+
+      '</div>'+
+    '</div>';
+  });
+  area.innerHTML = html;
+  // 恢复已答题的状态
+  currentChoiceIdx.forEach((q,i)=>{
+    if(q.userAnswer){
+      const opts = document.querySelectorAll('#opts_'+i+' .quiz-opt');
+      const ans = document.getElementById('ans_'+i);
+      const retry = document.getElementById('retry_'+i);
+      let userOptIdx = -1;
+      opts.forEach((o,j)=>{
+        if(o.textContent.charAt(0)===q.userAnswer) userOptIdx = j;
+      });
+      if(userOptIdx >= 0){
+        opts.forEach(o=>o.style.pointerEvents='none');
+        if(q.userAnswer === q.a){
+          opts[userOptIdx].classList.add('correct');
+        } else {
+          opts[userOptIdx].classList.add('wrong');
+          opts.forEach(o=>{
+            if(o.textContent.charAt(0)===q.a) o.classList.add('correct');
+          });
+        }
+        ans.classList.add('show');
+        retry.style.display='block';
+      }
+    }
+  });
+}
+
+function selectChoice(idx,letter,optIdx){
+  const q = currentChoiceIdx[idx];
+  const opts = document.querySelectorAll('#opts_'+idx+' .quiz-opt');
+  const ans = document.getElementById('ans_'+idx);
+  const retry = document.getElementById('retry_'+idx);
+  
+  opts.forEach(o=>o.classList.remove('selected','correct','wrong'));
+  // 禁止重复点击
+  opts.forEach(o=>o.style.pointerEvents='none');
+  
+  // 保存答题状态
+  q.userAnswer = letter;
+  saveChoiceState();
+  
+  if(letter === q.a){
+    opts[optIdx].classList.add('correct');
+    // 答对了，如果这道题在错题本里，移除它
+    removeFromWrongBook(q.q);
+  } else {
+    opts[optIdx].classList.add('wrong');
+    opts.forEach(o=>{
+      if(o.textContent.charAt(0)===q.a) o.classList.add('correct');
+    });
+    // 答错了，加入错题本
+    addToWrongBook(q, letter);
+  }
+  ans.classList.add('show');
+  retry.style.display='block';
+}
+
+// ===== 错题本 =====
+function getWrongBook(){
+  return JSON.parse(localStorage.getItem('wrongBook_'+currentExamTab)||'[]');
+}
+
+function saveWrongBook(list){
+  localStorage.setItem('wrongBook_'+currentExamTab, JSON.stringify(list));
+  updateWrongCount();
+}
+
+function addToWrongBook(q, wrongChoice){
+  const list = getWrongBook();
+  // 避免重复添加
+  if(!list.find(item=>item.q===q.q)){
+    list.push({...q, wrongChoice, addTime: Date.now()});
+    saveWrongBook(list);
+    toast('🎀 已自动加入错题本');
+  }
+}
+
+function removeFromWrongBook(question){
+  let list = getWrongBook();
+  list = list.filter(item=>item.q!==question);
+  saveWrongBook(list);
+}
+
+function updateWrongCount(){
+  const count = getWrongBook().length;
+  const el = document.getElementById('wrongCount');
+  if(el) el.textContent = count>0 ? count : '';
+}
+
+function toggleWrongBook(){
+  const area = document.getElementById('wrongArea');
+  const isHidden = area.style.display === 'none';
+  area.style.display = isHidden ? 'block' : 'none';
+  if(isHidden){
+    renderWrongBook();
+    area.scrollIntoView({behavior:'smooth'});
+  }
+}
+
+function renderWrongBook(){
+  const list = getWrongBook();
+  const area = document.getElementById('wrongContent');
+  updateWrongCount();
+  
+  if(list.length===0){
+    area.innerHTML = '<div class="empty"><div class="empty-icon">🎀</div><div>错题本还是空的～<br>答错的选择题会自动收录到这里</div></div>';
+    return;
+  }
+  
+  let html = '<div class="hint">🎀 共 '+list.length+' 道错题，答对后会自动移出。点击选项即可重做。</div>';
+  list.forEach((q,i)=>{
+    let opts = '';
+    q.options.forEach((opt,j)=>{
+      const letter = opt.charAt(0);
+      opts += '<div class="quiz-opt" onclick="selectWrongChoice('+i+',\''+letter+'\','+j+')">'+opt+'</div>';
+    });
+    html += '<div class="quiz-card" id="wcard_'+i+'" style="border-left-color:#f5c6cb;">'+
+      '<span class="quiz-num" style="background:#f5c6cb;color:#721c24;">🎀 错题 '+(i+1)+'</span>'+
+      '<div class="quiz-q">'+q.q+'</div>'+
+      '<div class="quiz-options" id="wopts_'+i+'">'+opts+'</div>'+
+      '<div class="quiz-answer" id="wans_'+i+'">'+
+        '<b>🎀 参考答案：'+q.a+'</b>'+
+        '<div style="margin-top:6px;font-weight:normal;">🎀 解析：'+q.analysis+'</div>'+
+      '</div>'+
+      '<div style="margin-top:8px;display:flex;gap:8px;">'+
+        '<button class="btn btn-outline btn-sm" onclick="delWrong('+i+')">🎀 移除</button>'+
+      '</div>'+
+    '</div>';
+  });
+  area.innerHTML = html;
+  
+  // 显示答案（错题本里的题默认显示答案）
+  list.forEach((_,i)=>{
+    const ans = document.getElementById('wans_'+i);
+    if(ans) ans.classList.add('show');
+    const opts = document.querySelectorAll('#wopts_'+i+' .quiz-opt');
+    opts.forEach(o=>{
+      o.style.pointerEvents='auto'; // 允许重新点击
+      // 标记之前的错误选择和正确答案
+      if(o.textContent.charAt(0)===list[i].wrongChoice) o.classList.add('wrong');
+      if(o.textContent.charAt(0)===list[i].a) o.classList.add('correct');
+    });
+  });
+}
+
+function selectWrongChoice(idx,letter,optIdx){
+  const list = getWrongBook();
+  const q = list[idx];
+  if(!q) return;
+  const opts = document.querySelectorAll('#wopts_'+idx+' .quiz-opt');
+  const card = document.getElementById('wcard_'+idx);
+  
+  opts.forEach(o=>{o.classList.remove('wrong','correct');o.style.pointerEvents='none';});
+  
+  if(letter === q.a){
+    opts[optIdx].classList.add('correct');
+    toast('🎀 答对了！已移出错题本');
+    setTimeout(()=>{
+      removeFromWrongBook(q.q);
+      renderWrongBook();
+    }, 1200);
+  } else {
+    opts[optIdx].classList.add('wrong');
+    opts.forEach(o=>{
+      if(o.textContent.charAt(0)===q.a) o.classList.add('correct');
+    });
+    toast('🎀 又错了，再看看解析～');
+    // 解锁允许再答
+    setTimeout(()=>{opts.forEach(o=>o.style.pointerEvents='auto');}, 800);
+  }
+}
+
+function delWrong(idx){
+  const list = getWrongBook();
+  list.splice(idx,1);
+  saveWrongBook(list);
+  renderWrongBook();
+  toast('已移除');
+}
+
+function clearWrongBook(){
+  if(getWrongBook().length===0){
+    toast('错题本已经是空的');
+    return;
+  }
+  saveWrongBook([]);
+  renderWrongBook();
+  toast('🎀 错题本已清空');
+}
+
+function retryAllWrong(){
+  const list = getWrongBook();
+  if(list.length===0){
+    toast('错题本是空的');
+    return;
+  }
+  // 把错题本里的题设为当前选择题列表
+  currentChoiceIdx = [...list];
+  renderChoice();
+  // 滚动到选择题区
+  document.getElementById('choiceArea').scrollIntoView({behavior:'smooth'});
+  toast('🎀 开始重做错题，答对自动移出！');
+}
+
+function retryChoice(idx){
+  const pool = QUESTIONS[currentExamTab+'_choice'];
+  const used = currentChoiceIdx.map(q=>q.q);
+  const available = pool.filter(q=>!used.includes(q.q));
+  let newQ;
+  if(available.length>0){
+    newQ = available[Math.floor(Math.random()*available.length)];
+  } else {
+    // 题库用完了，从全库里随机挑一道不同的
+    const diff = pool.filter(q=>q.q!==currentChoiceIdx[idx].q);
+    newQ = diff[Math.floor(Math.random()*diff.length)];
+  }
+  newQ.userAnswer = null;
+  currentChoiceIdx[idx] = newQ;
+  saveChoiceState();
+  renderChoiceSingle(idx);
+  toast('已换一道新题～');
+}
+
+function renderChoiceSingle(idx){
+  const q = currentChoiceIdx[idx];
+  const card = document.getElementById('qcard_'+idx);
+  let opts = '';
+  q.options.forEach((opt,j)=>{
+    const letter = opt.charAt(0);
+    opts += '<div class="quiz-opt" onclick="selectChoice('+idx+',\''+letter+'\','+j+')">'+opt+'</div>';
+  });
+  card.innerHTML =
+    '<span class="quiz-num">🎀 第'+(idx+1)+'题</span>'+
+    '<div class="quiz-q">'+q.q+'</div>'+
+    '<div class="quiz-options" id="opts_'+idx+'">'+opts+'</div>'+
+    '<div class="quiz-answer" id="ans_'+idx+'">'+
+      '<b>🎀 参考答案：'+q.a+'</b>'+
+      '<div style="margin-top:6px;font-weight:normal;">🎀 解析：'+q.analysis+'</div>'+
+    '</div>'+
+    '<div style="margin-top:8px;display:none;" id="retry_'+idx+'">'+
+      '<button class="btn btn-outline btn-sm" onclick="retryChoice('+idx+')">🎀 重新生成本题</button>'+
+    '</div>';
+}
+
+function renderShort(){
+  const area = document.getElementById('shortArea');
+  let html = '';
+  currentShortIdx.forEach((q,i)=>{
+    html += '<div class="short-card">'+
+      '<div class="short-label">🎀 简答题 '+(i+1)+'</div>'+
+      '<div class="short-q">'+q.q+'</div>'+
+      '<textarea class="textarea" id="short_'+i+'" placeholder="🎀 在这里写下你的答案..." oninput="saveShortAnswer('+i+')"></textarea>'+
+      '<div style="margin-top:8px;display:flex;gap:8px;">'+
+        '<button class="btn btn-outline btn-sm" onclick="toggleStdAns('+i+')">🎀 查看标准答案</button>'+
+        '<button class="btn btn-green btn-sm" onclick="checkShortAns('+i+')">🎀 小新批改</button>'+
+      '</div>'+
+      '<div class="std-answer" id="std_'+i+'">'+
+        '<span class="std-answer-label">🎀 标准答案：</span>'+q.a+
+      '</div>'+
+      '<div class="std-answer" id="check_'+i+'" style="background:var(--green);color:#fff;"></div>'+
+    '</div>';
+  });
+  area.innerHTML = html;
+  // 恢复已保存的答案
+  const saved = JSON.parse(localStorage.getItem('shortAnswers_'+currentExamTab)||'{}');
+  currentShortIdx.forEach((q,i)=>{
+    if(saved[q.q]){
+      document.getElementById('short_'+i).value = saved[q.q];
+    }
+  });
+}
+
+function saveShortAns(idx){
+  // placeholder for auto-save if needed
+}
+
+function saveShortAnswer(idx){
+  const val = document.getElementById('short_'+idx).value;
+  const saved = JSON.parse(localStorage.getItem('shortAnswers_'+currentExamTab)||'{}');
+  saved[currentShortIdx[idx].q] = val;
+  localStorage.setItem('shortAnswers_'+currentExamTab, JSON.stringify(saved));
+}
+
+function toggleStdAns(idx){
+  document.getElementById('std_'+idx).classList.toggle('show');
+}
+
+function checkShortAns(idx){
+  const userAns = document.getElementById('short_'+idx).value.trim();
+  const stdAns = currentShortIdx[idx].a;
+  const checkEl = document.getElementById('check_'+idx);
+  
+  if(!userAns){
+    toast('还没写答案哦～');
+    return;
+  }
+  
+  // 简单的关键词匹配
+  const keywords = stdAns.match(/[①②③④⑤⑥⑦⑧⑨⑩][^①②③④⑤⑥⑦⑧⑨⑩]*/g) || [];
+  let matchCount = 0;
+  keywords.forEach(kw=>{
+    const cleanKw = kw.replace(/^[①②③④⑤⑥⑦⑧⑨⑩]/,'').split(/[：；,，。、\s]/)[0];
+    if(cleanKw.length>1 && userAns.includes(cleanKw)){
+      matchCount++;
+    }
+  });
+  
+  const total = keywords.length || 1;
+  const score = Math.round(matchCount/total*100);
+  let level,emoji;
+  if(score>=80){level='很棒！意思到位了～';emoji='🎉';}
+  else if(score>=60){level='不错，再补充一些要点更好～';emoji='💪';}
+  else{level='继续加油，多看看标准答案的关键词～';emoji='📝';}
+  
+  checkEl.innerHTML = '<span class="std-answer-label">🎀 小新批改：</span>'+
+    emoji+' 关键词覆盖 '+matchCount+'/'+total+'，得分约 '+score+'分。'+level+
+    '<br><br><b>标准答案要点：</b>'+stdAns;
+  checkEl.classList.add('show');
+  toast('批改完成～');
+}
+
+// ===== 填空默写 =====
+function goFill(){
+  document.getElementById('fillArea').style.display = 'block';
+  refreshFill();
+  document.getElementById('fillArea').scrollIntoView({behavior:'smooth'});
+}
+
+function refreshFill(){
+  const pool = QUESTIONS[currentExamTab+'_fill'];
+  const shuffled = [...pool].sort(()=>Math.random()-0.5).slice(0,10);
+  currentFillIdx = shuffled;
+  renderFill();
+  toast('已刷新默写题');
+}
+
+function renderFill(){
+  const area = document.getElementById('fillContent');
+  let html = '';
+  currentFillIdx.forEach((q,i)=>{
+    const blanks = q.a.length;
+    let qDisplay = q.q;
+    let inputs = '';
+    for(let j=0;j<blanks;j++){
+      inputs += '<input type="text" class="fill-input" id="fill_'+i+'_'+j+'" placeholder="空'+(j+1)+'"> ';
+    }
+    // 将___替换为输入框
+    qDisplay = q.q.replace(/___/g, '<input type="text" class="fill-input" id="fill_'+i+'_$&" placeholder="填空">');
+    // 由于replace的$&问题，改用split
+    const parts = q.q.split('___');
+    let qHtml = '';
+    for(let k=0;k<parts.length;k++){
+      qHtml += parts[k];
+      if(k < blanks){
+        qHtml += '<input type="text" class="fill-input" id="fill_'+i+'_'+k+'" placeholder="空'+(k+1)+'">';
+      }
+    }
+    html += '<div class="fill-card">'+
+      '<div class="short-label">🎀 默写 '+(i+1)+'</div>'+
+      '<div class="fill-q">'+qHtml+'</div>'+
+      '<button class="btn btn-outline btn-sm" onclick="checkFill('+i+')">🎀 批改本题</button>'+
+      '<div class="fill-result" id="fillResult_'+i+'"></div>'+
+    '</div>';
+  });
+  area.innerHTML = html;
+}
+
+function checkFill(idx){
+  const q = currentFillIdx[idx];
+  let allPass = true;
+  let detail = '';
+  q.a.forEach((ans,j)=>{
+    const input = document.getElementById('fill_'+idx+'_'+j);
+    if(!input) return;
+    const userVal = input.value.trim();
+    const isCorrect = userVal === ans || ans.includes(userVal) && userVal.length>0;
+    if(isCorrect){
+      input.style.borderColor = 'var(--green)';
+      input.style.background = '#d4edda';
+    } else {
+      input.style.borderColor = '#f5c6cb';
+      input.style.background = '#f8d7da';
+      allPass = false;
+      detail += '空'+(j+1)+'应填"'+ans+'"；';
+    }
+  });
+  
+  const result = document.getElementById('fillResult_'+idx);
+  result.className = 'fill-result show ' + (allPass?'pass':'fail');
+  result.innerHTML = allPass ? '🎀 全部正确！太棒了～🎉' : '🎀 '+detail;
+  toast(allPass?'全对！':'有错误，看看标准答案～');
+}
+
+function checkAllFill(){
+  currentFillIdx.forEach((_,i)=>checkFill(i));
+  toast('已全部批改');
+}
+
+// ===== 减脂餐 =====
+let foodList = [];
+
+function addFood(){
+  const input = document.getElementById('foodInput');
+  const val = input.value.trim();
+  if(!val) return;
+  foodList.push(val);
+  input.value = '';
+  renderFoodTags();
+}
+
+function clearFood(){
+  foodList = [];
+  renderFoodTags();
+  document.getElementById('dietResult').innerHTML = '';
+}
+
+function removeFood(idx){
+  foodList.splice(idx,1);
+  renderFoodTags();
+}
+
+function renderFoodTags(){
+  const area = document.getElementById('foodTags');
+  if(foodList.length===0){
+    area.innerHTML = '<span style="color:var(--text-light);font-size:13px;">还没有添加食材哦～</span>';
+    return;
+  }
+  area.innerHTML = foodList.map((f,i)=>
+    '<span class="food-tag">🎀 '+f+' <span class="remove" onclick="removeFood('+i+')">✕</span></span>'
+  ).join('');
+}
+
+// 食材分类数据库
+const FOOD_DB = {
+  protein:{name:'蛋白质',items:['鸡胸肉','鸡蛋','鱼肉','虾','牛肉','豆腐','牛奶','酸奶','瘦猪肉','鸡腿肉']},
+  veggie:{name:'蔬菜',items:['西兰花','菠菜','生菜','黄瓜','番茄','芹菜','白菜','芦笋','冬瓜','苦瓜','彩椒','蘑菇','海带']},
+  carb:{name:'主食/碳水',items:['糙米','红薯','紫薯','燕麦','玉米','全麦面包','土豆','南瓜','藜麦','荞麦']},
+  fruit:{name:'水果',items:['苹果','香蕉','橙子','蓝莓','草莓','猕猴桃','柚子','火龙果','圣女果']},
+  fat:{name:'健康脂肪',items:['牛油果','坚果','橄榄油','芝麻']}
+};
+
+function matchFood(food){
+  for(const cat in FOOD_DB){
+    if(FOOD_DB[cat].items.some(item=>food.includes(item)||item.includes(food))){
+      return {cat, item: FOOD_DB[cat].items.find(item=>food.includes(item)||item.includes(food))};
+    }
+  }
+  return null;
+}
+
+function generateDiet(){
+  if(foodList.length===0){
+    toast('先添加冰箱里的食材吧～');
+    return;
+  }
+  
+  // 分析食材
+  const matched = foodList.map(f=>({food:f, match:matchFood(f)}));
+  const categorized = {protein:[],veggie:[],carb:[],fruit:[],fat:[]};
+  const unmatched = [];
+  matched.forEach(m=>{
+    if(m.match){
+      categorized[m.match.cat].push(m.match.item);
+    } else {
+      unmatched.push(m.food);
+    }
+  });
+  
+  // 生成食谱
+  const totalCal = 1400 + Math.floor(Math.random()*200); // 1400-1600
+  const breakfastCal = Math.round(totalCal*0.3);
+  const lunchCal = Math.round(totalCal*0.4);
+  const dinnerCal = Math.round(totalCal*0.3);
+  
+  // 从匹配的食材中选
+  const pickFrom = (arr,n)=>arr.length>=n ? [...arr].sort(()=>Math.random()-0.5).slice(0,n) : arr;
+  
+  const breakfastItems = [
+    ...pickFrom(categorized.protein.length?categorized.protein:['鸡蛋','牛奶'],1),
+    ...pickFrom(categorized.carb.length?categorized.carb:['全麦面包','燕麦'],1),
+    ...pickFrom(categorized.veggie.length?categorized.veggie:['生菜','番茄'],1)
+  ];
+  
+  const lunchItems = [
+    ...pickFrom(categorized.protein.length?categorized.protein:['鸡胸肉','鱼肉'],1),
+    ...pickFrom(categorized.carb.length?categorized.carb:['糙米','红薯'],1),
+    ...pickFrom(categorized.veggie.length?categorized.veggie:['西兰花','菠菜'],2)
+  ];
+  
+  const dinnerItems = [
+    ...pickFrom(categorized.protein.length?categorized.protein:['豆腐','虾'],1),
+    ...pickFrom(categorized.veggie.length?categorized.veggie:['黄瓜','冬瓜'],2),
+    ...(categorized.carb.length?pickFrom(categorized.carb,1):[])
+  ];
+  
+  // 替换建议
+  let replaceAdvice = '';
+  if(unmatched.length>0){
+    replaceAdvice = '<div class="card"><h3 style="font-size:15px;margin-bottom:8px;">🎀 食材识别 & 替换建议</div>'+
+      '<div class="list-item"><span class="item-icon">🎀</span><div class="item-content">'+
+      unmatched.map(f=>'<b>'+f+'</b>：小新不太认识这个食材，如果是蛋白质类可替换为鸡胸肉/鸡蛋；蔬菜类可替换为西兰花/菠菜；主食类可替换为糙米/红薯。').join('<br>')+
+      '</div></div></div>';
+  }
+  
+  const dietHtml = 
+    '<div class="diet-summary">'+
+      '<h3>🎀 今日减脂食谱</h3>'+
+      '<div class="diet-cal">'+totalCal+' <small>kcal / 天</small></div>'+
+      '<div style="margin-top:8px;font-size:13px;opacity:.9;">基于你的食材搭配，均衡低脂</div>'+
+      '<div class="progress-bar" style="background:rgba(255,255,255,.3);margin-top:10px;">'+
+        '<div class="progress-fill" style="width:100%;background:#fff;"></div>'+
+      '</div>'+
+    '</div>'+
+    
+    '<div class="meal-card">'+
+      '<div class="meal-header">'+
+        '<span class="meal-icon">🎀</span>'+
+        '<span class="meal-title">早餐</span>'+
+        '<span class="meal-cal">'+breakfastCal+' kcal</span>'+
+      '</div>'+
+      '<ul class="meal-list">'+
+        breakfastItems.map(i=>'<li><span class="item-icon">🎀</span><span class="item-content">'+i+'（水煮/清蒸）</span></li>').join('')+
+        '<li><span class="item-icon">🎀</span><span class="item-content">一杯温水/无糖豆浆</span></li>'+
+      '</ul>'+
+      '<div class="hint">🎀 建议：早餐吃好，补充蛋白质和碳水，开启元气一天</div>'+
+    '</div>'+
+    
+    '<div class="meal-card">'+
+      '<div class="meal-header">'+
+        '<span class="meal-icon">🎀</span>'+
+        '<span class="meal-title">午餐</span>'+
+        '<span class="meal-cal">'+lunchCal+' kcal</span>'+
+      '</div>'+
+      '<ul class="meal-list">'+
+        lunchItems.map(i=>'<li><span class="item-icon">🎀</span><span class="item-content">'+i+'（少油烹饪）</span></li>').join('')+
+        '<li><span class="item-icon">🎀</span><span class="item-content">主食控制在拳头大小</span></li>'+
+      '</ul>'+
+      '<div class="hint">🎀 建议：午餐吃饱，蛋白质+蔬菜+适量碳水，下午不易饿</div>'+
+    '</div>'+
+    
+    '<div class="meal-card">'+
+      '<div class="meal-header">'+
+        '<span class="meal-icon">🎀</span>'+
+        '<span class="meal-title">晚餐</span>'+
+        '<span class="meal-cal">'+dinnerCal+' kcal</span>'+
+      '</div>'+
+      '<ul class="meal-list">'+
+        dinnerItems.map(i=>'<li><span class="item-icon">🎀</span><span class="item-content">'+i+'（清淡为主）</span></li>').join('')+
+        '<li><span class="item-icon">🎀</span><span class="item-content">睡前3小时不进食</span></li>'+
+      '</ul>'+
+      '<div class="hint">🎀 建议：晚餐吃少，减少碳水，多蔬菜和优质蛋白</div>'+
+    '</div>'+
+    
+    replaceAdvice+
+    
+    '<div class="card">'+
+      '<h3 style="font-size:15px;margin-bottom:10px;">🎀 热量参考表</h3>'+
+      '<div class="list-item"><span class="item-icon">🎀</span><span class="item-content">鸡胸肉100g ≈ 133 kcal</span></div>'+
+      '<div class="list-item"><span class="item-icon">🎀</span><span class="item-content">鸡蛋1个 ≈ 70 kcal</span></div>'+
+      '<div class="list-item"><span class="item-icon">🎀</span><span class="item-content">西兰花100g ≈ 34 kcal</span></div>'+
+      '<div class="list-item"><span class="item-icon">🎀</span><span class="item-content">糙米100g(熟) ≈ 112 kcal</span></div>'+
+      '<div class="list-item"><span class="item-icon">🎀</span><span class="item-content">红薯100g ≈ 86 kcal</span></div>'+
+      '<div class="list-item"><span class="item-icon">🎀</span><span class="item-content">豆腐100g ≈ 72 kcal</span></div>'+
+      '<div class="list-item"><span class="item-icon">🎀</span><span class="item-content">牛奶200ml ≈ 104 kcal</span></div>'+
+    '</div>'+
+    
+    '<div class="card">'+
+      '<h3 style="font-size:15px;margin-bottom:8px;">🎀 食材替换方案</h3>'+
+      '<div class="list-item"><span class="item-icon">🎀</span><span class="item-content">鸡胸肉 → 鱼肉/虾/瘦牛肉（同为优质蛋白）</span></div>'+
+      '<div class="list-item"><span class="item-icon">🎀</span><span class="item-content">西兰花 → 菠菜/芦笋/芹菜（同为低卡蔬菜）</span></div>'+
+      '<div class="list-item"><span class="item-icon">🎀</span><span class="item-content">糙米 → 红薯/玉米/藜麦（同为慢碳水）</span></div>'+
+      '<div class="list-item"><span class="item-icon">🎀</span><span class="item-content">鸡蛋 → 豆腐/希腊酸奶（同为蛋白质来源）</span></div>'+
+    '</div>';
+  
+  document.getElementById('dietResult').innerHTML = dietHtml;
+  toast('食谱已生成～');
+}
+
+// ===== 健身打卡 =====
+function getCheckins(){
+  return JSON.parse(localStorage.getItem('checkins')||'[]');
+}
+
+function addCheckin(){
+  const name = document.getElementById('exName').value.trim();
+  const duration = document.getElementById('exDuration').value;
+  const cal = document.getElementById('exCal').value;
+  const weight = document.getElementById('exWeight').value;
+  const intensity = document.getElementById('exIntensity').value;
+  
+  if(!name){
+    toast('请填写运动项目');
+    return;
+  }
+  
+  const checkin = {
+    date: new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),
+    name, duration, cal, weight, intensity,
+    timestamp: Date.now()
+  };
+  
+  const list = getCheckins();
+  list.unshift(checkin);
+  localStorage.setItem('checkins', JSON.stringify(list));
+  
+  // 清空输入
+  document.getElementById('exName').value = '';
+  document.getElementById('exDuration').value = '';
+  document.getElementById('exCal').value = '';
+  document.getElementById('exWeight').value = '';
+  
+  renderCheckins();
+  generateAdvice(checkin);
+  toast('打卡成功！🎀');
+}
+
+function renderCheckins(){
+  const list = getCheckins();
+  const area = document.getElementById('checkinList');
+  
+  // 更新统计
+  document.getElementById('totalCheckins').textContent = list.length;
+  const latestWeight = list.find(c=>c.weight);
+  document.getElementById('latestWeight').textContent = latestWeight ? latestWeight.weight : '--';
+  
+  if(list.length===0){
+    area.innerHTML = '<div class="empty"><div class="empty-icon">🎀</div><div>还没有打卡记录<br>开始你的第一次运动打卡吧！</div></div>';
+    return;
+  }
+  
+  area.innerHTML = list.map((c,i)=>{
+    let detail = c.name;
+    if(c.duration) detail += ' · '+c.duration+'分钟';
+    if(c.cal) detail += ' · '+c.cal+'kcal';
+    if(c.weight) detail += ' · 体重'+c.weight+'kg';
+    if(c.intensity) detail += ' · '+c.intensity;
+    
+    return '<div class="checkin-item">'+
+      '<span class="ci-icon">🎀</span>'+
+      '<div class="ci-content">'+
+        '<div class="ci-detail">'+detail+'</div>'+
+        '<div class="ci-date">'+c.date+'</div>'+
+      '</div>'+
+      '<span class="ci-del" onclick="delCheckin('+i+')">✕</span>'+
+    '</div>';
+  }).join('');
+}
+
+function delCheckin(idx){
+  const list = getCheckins();
+  list.splice(idx,1);
+  localStorage.setItem('checkins', JSON.stringify(list));
+  renderCheckins();
+  toast('已删除');
+}
+
+function generateAdvice(latestCheckin){
+  const list = getCheckins();
+  const yesterday = list[1]; // 前一条记录
+  
+  let advice = '<div class="advice-card">'+
+    '<h3>🎀 小新的运动建议</h3>'+
+    '<div class="advice-content">';
+  
+  if(yesterday){
+    const yIntensity = yesterday.intensity || '适中';
+    advice += '<div style="margin-bottom:8px;">🎀 昨天你做了<b>'+yesterday.name+'</b>（'+yIntensity+'），';
+    
+    if(yIntensity === '高强度'){
+      advice += '今天建议<b>低强度恢复</b>：散步、瑜伽、拉伸，让肌肉休息一下～';
+    } else if(yIntensity === '轻松'){
+      advice += '今天可以<b>适当加量</b>：慢跑30分钟、跳绳、或力量训练，提升燃脂效果～';
+    } else {
+      advice += '今天建议<b>换一个运动项目</b>：如果昨天有氧，今天做力量；如果昨天力量，今天做有氧，均衡发展～';
+    }
+    advice += '</div>';
+  } else {
+    advice += '<div style="margin-bottom:8px;">🎀 这是你的第一次打卡！建议从<b>中等强度</b>开始：慢跑20-30分钟或基础力量训练，循序渐进～</div>';
+  }
+  
+  if(latestCheckin.weight){
+    const weights = list.filter(c=>c.weight).map(c=>parseFloat(c.weight));
+    if(weights.length>=2){
+      const diff = (weights[0] - weights[1]).toFixed(1);
+      if(diff < 0){
+        advice += '<div style="margin-bottom:8px;">🎀 体重变化：'+Math.abs(diff)+'kg ↓ 继续保持，减脂有效果！</div>';
+      } else if(diff > 0){
+        advice += '<div style="margin-bottom:8px;">🎀 体重变化：'+diff+'kg ↑ 别担心，可能是水分/肌肉增加，关注体脂率更重要～</div>';
+      } else {
+        advice += '<div style="margin-bottom:8px;">🎀 体重保持稳定，坚持下去就会有变化～</div>';
+      }
+    }
+  }
+  
+  advice += '</div>'+
+    '<div class="advice-actions">'+
+      '<button class="btn btn-yellow btn-sm" onclick="adoptAdvice(true)">🎀 采纳建议</button>'+
+      '<button class="btn btn-sm" style="background:rgba(255,255,255,.3);color:#fff;" onclick="adoptAdvice(false)">🎀 不采纳</button>'+
+    '</div>'+
+  '</div>';
+  
+  document.getElementById('adviceArea').innerHTML = advice;
+}
+
+function adoptAdvice(adopt){
+  if(adopt){
+    toast('好的！小新已记录，明天继续加油～🎀');
+  } else {
+    toast('没关系，按自己的节奏来！小新随时在～🎀');
+  }
+  document.getElementById('adviceArea').innerHTML = '';
+}
+
+// ===== 小米手环同步 =====
+function syncBand(){
+  toast('正在同步手环数据...');
+  
+  // 模拟手环数据（实际使用时可对接小米运动健康API）
+  setTimeout(()=>{
+    const steps = 6000 + Math.floor(Math.random()*6000);
+    const cal = 150 + Math.floor(Math.random()*200);
+    const sleepHours = (6 + Math.random()*2.5).toFixed(1);
+    
+    document.getElementById('bandHint').style.display = 'none';
+    document.getElementById('bandGrid').style.display = 'grid';
+    document.getElementById('bandSteps').textContent = steps.toLocaleString();
+    document.getElementById('bandCal').textContent = cal;
+    document.getElementById('bandSleep').textContent = sleepHours;
+    
+    // 生成建议
+    let advice = '<div class="card" style="margin-top:10px;border-left:4px solid var(--blue);">'+
+      '<h3 style="font-size:15px;margin-bottom:8px;">🎀 小新根据手环数据的建议</h3>';
+    
+    const list = document.createElement('div');
+    list.className = 'meal-list';
+    
+    if(steps < 8000){
+      list.innerHTML += '<div class="list-item"><span class="item-icon">🎀</span><span class="item-content">步数偏少，建议今天多走走，目标8000+步</span></div>';
+    } else {
+      list.innerHTML += '<div class="list-item"><span class="item-icon">🎀</span><span class="item-content">步数达标！活动量不错，继续保持～</span></div>';
+    }
+    
+    if(parseFloat(sleepHours) < 7){
+      list.innerHTML += '<div class="list-item"><span class="item-icon">🎀</span><span class="item-content">睡眠不足7小时，建议早点休息，睡眠对减脂很重要哦</span></div>';
+    } else {
+      list.innerHTML += '<div class="list-item"><span class="item-icon">🎀</span><span class="item-content">睡眠充足，身体恢复不错～</span></div>';
+    }
+    
+    list.innerHTML += '<div class="list-item"><span class="item-icon">🎀</span><span class="item-content">今日消耗'+cal+'kcal，'+(cal>250?'运动量充足':'可以再增加一些运动量')+'</span></div>';
+    
+    advice += list.innerHTML + '</div>';
+    document.getElementById('bandAdvice').innerHTML = advice;
+    document.getElementById('bandAdvice').style.display = 'block';
+    
+    toast('同步完成！🎀');
+  }, 1200);
+}
+
+// ===== 初始化 =====
+initDate();
+renderFoodTags();
+restoreOrRefresh('choice');
+restoreOrRefresh('short');
+renderCheckins();
+updateWrongCount();
+
+// 提示添加到桌面
+if(!window.navigator.standalone && !window.matchMedia('(display-mode: standalone)').matches){
+  if(localStorage.getItem('homeScreenTiped') !== 'yes'){
+    setTimeout(()=>{
+      toast('点击Safari分享按钮，选"添加到主屏幕"即可像App一样使用～');
+      localStorage.setItem('homeScreenTiped','yes');
+    }, 3000);
+  }
+}
+</script>
+</body>
+</html>
