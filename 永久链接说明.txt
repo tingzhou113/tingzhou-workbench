@@ -1,0 +1,22 @@
+# 汀洲工作台 - 永久链接
+
+## 方案一：永久在线链接（推荐）
+
+直接在Safari打开以下链接：
+
+https://htmlpreview.github.io/?https://dpaste.com/4ZS6PZDVQ.txt
+
+这个链接通过htmlpreview渲染加载器页面，加载器会自动从dpaste获取完整工作台内容并渲染。
+
+**添加到桌面方法：**
+1. 用Safari打开上方链接
+2. 等待加载完成（约2-3秒）
+3. 点击Safari底部分享按钮
+4. 选择"添加到主屏幕"
+5. 点击"添加"
+
+## 方案二：沙箱预览链接（备用）
+
+https://webview.e2b.gz3.sandbox.cloudstudio.club/?x-cs-sandbox-id=75d19f6bfbf743d084227955154a57fa&x-cs-sandbox-port=8000
+
+这个链接在沙箱休眠时会临时不可用，但跟我聊一句话就会恢复。

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="汀洲工作台">
+<title>汀洲工作台</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#FFF5F8;font-family:-apple-system,sans-serif;}
+#l{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:#E0789F;}
+#l .icon{font-size:50px;margin-bottom:12px;animation:b 1.5s ease infinite;}
+#l .txt{font-size:15px;}
+#l .bar{width:200px;height:6px;background:#FFD6E5;border-radius:3px;margin:12px auto 0;overflow:hidden;}
+#l .fill{height:100%;background:#FF9EC4;border-radius:3px;transition:width .3s;width:0;}
+@keyframes b{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+</style>
+</head>
+<body>
+<div id="l">
+<div class="icon">🎀</div>
+<div class="txt">汀洲工作台加载中...</div>
+<div class="bar"><div class="fill" id="f"></div></div>
+</div>
+<script>
+var urls = ["https://dpaste.com/CGVK3MHNL.txt", "https://dpaste.com/2G3GE6Z59.txt", "https://dpaste.com/4WKXMD9LY.txt", "https://dpaste.com/DSZBFD2EK.txt", "https://dpaste.com/BSWPDMXW5.txt", "https://dpaste.com/EVFRYS25E.txt", "https://dpaste.com/8KV98VGF3.txt", "https://dpaste.com/A624KTB5E.txt", "https://dpaste.com/GE7394TGX.txt", "https://dpaste.com/5VRXCGRPB.txt", "https://dpaste.com/5JDT834LW.txt", "https://dpaste.com/C2D8WDNLQ.txt", "https://dpaste.com/62W8RFLV3.txt", "https://dpaste.com/8AMSNTPHZ.txt", "https://dpaste.com/6CD5273LV.txt", "https://dpaste.com/3YP42BJFX.txt", "https://dpaste.com/E8GBY22KJ.txt", "https://dpaste.com/5BK2UTC7Y.txt", "https://dpaste.com/EJTXE2AD9.txt", "https://dpaste.com/83NQZ5RRS.txt", "https://dpaste.com/9JAS3EB7A.txt", "https://dpaste.com/ETV6XQFV4.txt", "https://dpaste.com/ECEZJ7FN7.txt", "https://dpaste.com/H8UJEUSKK.txt", "https://dpaste.com/FLY7D4ZQ3.txt", "https://dpaste.com/BAULL5YGX.txt", "https://dpaste.com/5T46HUUY3.txt", "https://dpaste.com/4XJJ823SX.txt", "https://dpaste.com/BYK4FMYCT.txt", "https://dpaste.com/839XESSLN.txt", "https://dpaste.com/G2LRSR8LL.txt", "https://dpaste.com/ANKT73RYM.txt", "https://dpaste.com/A2MGP6BFN.txt", "https://dpaste.com/7QB4KFDDN.txt", "https://dpaste.com/AEPJG3VWJ.txt", "https://dpaste.com/4WSP5F4JY.txt", "https://dpaste.com/978B8N5EC.txt", "https://dpaste.com/2PZ6S9QKX.txt", "https://dpaste.com/3A7B4CV8R.txt"];
+var parts = [];
+var done = 0;
+var total = urls.length;
+
+function fetchOne(i){
+  return fetch(urls[i]).then(function(r){return r.text();}).then(function(t){
+    parts[i] = t.trim();
+    done++;
+    document.getElementById('f').style.width = (done/total*100)+'%';
+  });
+}
+
+Promise.all(urls.map(function(u,i){return fetchOne(i);})).then(function(){
+  var b64 = parts.join('');
+  try {
+    // base64解码
+    var bin = atob(b64);
+    // 转成Uint8Array
+    var bytes = new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+    // zlib解压 (用pako或DecompressionStream)
+    if(typeof DecompressionStream !== 'undefined'){
+      // 用原生DecompressionStream
+      var ds = new DecompressionStream('deflate');
+      var blob = new Blob([bytes]);
+      var stream = blob.stream().pipeThrough(ds);
+      new Response(stream).text().then(function(html){
+        document.open();
+        document.write(html);
+        document.close();
+      });
+    } else {
+      // 回退：直接base64解码原始HTML（不压缩的备用方案）
+      document.body.innerHTML = '<div style="padding:20px;text-align:center;color:#E0789F;">🎀 浏览器不支持解压，请用Safari打开</div>';
+    }
+  } catch(e) {
+    document.body.innerHTML = '<div style="padding:20px;text-align:center;color:#E0789F;">🎀 加载失败:'+e.message+'</div>';
+  }
+}).catch(function(e){
+  document.body.innerHTML = '<div style="padding:20px;text-align:center;color:#E0789F;">🎀 网络错误，请刷新重试<br><button onclick="location.reload()" style="margin-top:10px;padding:8px 20px;background:#FF9EC4;color:#fff;border:none;border-radius:20px;">重试</button></div>';
+});
+</script>
+</body>
+</html>
