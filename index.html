@@ -30,7 +30,7 @@ body{
 .header{
   background:linear-gradient(135deg,var(--pink) 0%,var(--pink-dark) 100%);
   padding:50px 20px 24px;color:#fff;text-align:center;
-  position:sticky;top:0;z-index:100;
+  position:relative;z-index:100;
   box-shadow:0 2px 16px rgba(224,120,159,.3);
 }
 .header-avatar{font-size:42px;margin-bottom:6px;animation:bounce 2s ease infinite;}
@@ -396,7 +396,7 @@ body{
     <div class="hint">输入食材后点击添加，小新会根据食材为你搭配一日三餐～</div>
     <div class="food-tags" id="foodTags"></div>
     <div class="food-add">
-      <input type="text" id="foodInput" class="textarea" style="min-height:40px;flex:1;" placeholder="如：鸡胸肉、西兰花、鸡蛋..." onkeydown="if(event.key==='Enter')addFood()">
+      <input type="text" id="foodInput" class="textarea" style="min-height:40px;flex:1;" placeholder="逗号分隔多个，如：鸡胸肉,西兰花,鸡蛋" onkeydown="if(event.key==='Enter')addFood()">
       <button class="btn btn-green btn-sm" onclick="addFood()">🎀 添加</button>
     </div>
     <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
@@ -996,7 +996,9 @@ function addFood(){
   const input = document.getElementById('foodInput');
   const val = input.value.trim();
   if(!val) return;
-  foodList.push(val);
+  // 支持逗号/顿号分隔批量添加
+  const items = val.split(/[,，、\s]+/).filter(s=>s.trim());
+  items.forEach(s=>foodList.push(s.trim()));
   input.value = '';
   renderFoodTags();
 }
